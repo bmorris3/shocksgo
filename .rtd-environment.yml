@@ -3,7 +3,7 @@ name: shocksgo
 channels:
     - astropy
     - conda-forge
-    
+
 dependencies:
     - python>=3.5
     - astropy
@@ -13,5 +13,6 @@ dependencies:
     - sphinx-astropy
     - pybind11
     - celerite
+    - scipy
 #    - pip:
 
