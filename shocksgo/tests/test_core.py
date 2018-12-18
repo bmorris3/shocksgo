@@ -15,7 +15,8 @@ def test_sun():
     L = 1*L_sun
     T_eff = 5777 * u.K
 
-    y_sun, kernel_sun2 = generate_stellar_fluxes(1e5, M, T_eff, L, cadence=60*u.s)
+    y_sun, kernel_sun2 = generate_stellar_fluxes(1e5, M, T_eff, L,
+                                                 cadence=60*u.s)
 
     np.testing.assert_allclose(kernel_sun.get_psd(2*np.pi*f),
                                kernel_sun2.get_psd(2*np.pi*f))
