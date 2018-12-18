@@ -8,11 +8,12 @@ import os
 __all__ = ['generate_solar_fluxes', 'generate_stellar_fluxes']
 
 dirname = os.path.dirname(os.path.abspath(__file__))
-parameter_vector = np.loadtxt(os.path.join(dirname, 'data', 'parameter_vector.txt'))
+parameter_vector = np.loadtxt(os.path.join(dirname, 'data',
+                                           'parameter_vector.txt'))
 
 
 @u.quantity_input(cadence=u.s)
-def generate_solar_fluxes(size, cadence=60*u.s, parameter_vector=parameter_vector):
+def generate_solar_fluxes(size, cadence=60*u.s):
     """
     Generate an array of fluxes with zero mean which mimic the power spectrum of
     the SOHO/VIRGO SPM observations.
@@ -26,7 +27,7 @@ def generate_solar_fluxes(size, cadence=60*u.s, parameter_vector=parameter_vecto
     
     Returns
     -------
-    y : `~numpy.ndarray`
+    fluxes : `~numpy.ndarray`
         Array of fluxes at cadence ``cadence`` of length ``size``.
     """
     nterms = len(parameter_vector)//3
@@ -69,7 +70,7 @@ def generate_solar_fluxes(size, cadence=60*u.s, parameter_vector=parameter_vecto
 
 
 @u.quantity_input(cadence=u.s, M=u.kg, T_eff=u.K, L=u.W)
-def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s, parameter_vector=parameter_vector):
+def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s):
     """
     Generate an array of fluxes with zero mean which mimic the power spectrum of
     the SOHO/VIRGO SPM observations.
@@ -89,10 +90,11 @@ def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s, parameter_vector=
     
     Returns
     -------
-    y : `~numpy.ndarray`
+    fluxes : `~numpy.ndarray`
         Array of fluxes at cadence ``cadence`` of length ``size``.
     """
-    parameter_vector = parameter_vector.copy()
+    global parameter_vector
+    parameter_vector = np.copy(parameter_vector)
     
     tunable_amps = np.exp(parameter_vector[::3][2:])
     tunable_freqs = np.exp(parameter_vector[2::3][2:]) * 1e6/2/np.pi

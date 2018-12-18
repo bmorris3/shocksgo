@@ -1,10 +1,10 @@
 **********************
-arcesetc Documentation
+shocksgo Documentation
 **********************
 
-This is the documentation for arcesetc.
+This is the documentation for shocksgo.
 
 Reference/API
 =============
 
-.. automodapi:: arcesetc
+.. automodapi:: shocksgo

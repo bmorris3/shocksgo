@@ -165,7 +165,7 @@ if we plot the power spectrum::
     plt.semilogy(freq * 1e6, power, ',', label='Samples')
     plt.semilogy(freq * 1e6, 2*np.pi*kernel.get_psd(2*np.pi*freq), alpha=0.7, label='Kernel')
     plt.ylim([1e-8, 1e-4])
-    plt.xlim([2500, 5000])
+    plt.xlim([3000, 6000])
     plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power')
     plt.show()
 
@@ -192,6 +192,6 @@ if we plot the power spectrum::
     plt.semilogy(freq * 1e6, power, ',', label='Samples')
     plt.semilogy(freq * 1e6, 2*np.pi*kernel.get_psd(2*np.pi*freq), alpha=0.7, label='Kernel')
     plt.ylim([1e-8, 1e-4])
-    plt.xlim([2500, 5000])
+    plt.xlim([3000, 6000])
     plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power')
     plt.show()
