@@ -17,7 +17,7 @@ following::
     times = np.arange(len(fluxes))
 
     plt.plot(times, fluxes)
-    plt.gca().set(xlabel='Time [seconds]', ylabel='Relative Flux')
+    plt.gca().set(xlabel='Time [minutes]', ylabel='Relative Flux')
     plt.show()
 
 .. plot::
@@ -29,7 +29,7 @@ following::
     fluxes, kernel = generate_solar_fluxes(size=1e5, cadence=60*u.s)
 
     plt.plot(fluxes)
-    plt.gca().set(xlabel='Time [seconds]', ylabel='Relative Flux')
+    plt.gca().set(xlabel='Time [minutes]', ylabel='Relative Flux')
     plt.show()
 
 We can check that the power spectrum of the fluxes that we've generated
@@ -117,7 +117,7 @@ following::
 
     fluxes, kernel = generate_stellar_fluxes(size=1e7, M=M, T_eff=T_eff, L=L, cadence=60*u.s)
 
-    times = np.arange(len(fluxes)) / 60 / 60 / 24
+    times = np.arange(len(fluxes)) / 60 / 24
 
     plt.plot(times, fluxes)
     plt.gca().set(xlabel='Time [days]', ylabel='Relative Flux', title='G9V star')
@@ -138,7 +138,7 @@ following::
 
     fluxes, kernel = generate_stellar_fluxes(size=1e7, M=M, T_eff=T_eff, L=L, cadence=60*u.s)
 
-    times = np.arange(len(fluxes)) / 60 / 60 / 24
+    times = np.arange(len(fluxes)) / 60 / 24
 
     plt.plot(times, fluxes)
     plt.gca().set(xlabel='Time [days]', ylabel='Relative Flux', title='G9V star')
