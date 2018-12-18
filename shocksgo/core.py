@@ -30,9 +30,14 @@ def generate_solar_fluxes(size, cadence=60*u.s):
     fluxes : `~numpy.ndarray`
         Array of fluxes at cadence ``cadence`` of length ``size``.
     kernel : `~celerite.terms.TermSum`
-        Celerite kernel used to approximate the solar PSD.
+        Celerite kernel used to approximate the solar power spectrum.
     """
     global parameter_vector
+
+    ##########################
+    # Assemble celerite kernel
+    ##########################
+
     nterms = len(parameter_vector)//3
 
     kernel = terms.SHOTerm(log_S0=0, log_omega0=0, log_Q=0) 
@@ -46,6 +51,10 @@ def generate_solar_fluxes(size, cadence=60*u.s):
     
     x = np.arange(0, size//500, cadence.to(u.s).value) 
     gp.compute(x, check_sorted=False)
+
+    ###################################
+    # Get samples with the kernel's PSD
+    ###################################
 
     y = gp.sample(500)
     
@@ -77,7 +86,8 @@ def generate_solar_fluxes(size, cadence=60*u.s):
 def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s):
     """
     Generate an array of fluxes with zero mean which mimic the power spectrum of
-    the SOHO/VIRGO SPM observations.
+    the SOHO/VIRGO SPM observations, scaled for a star with a given mass,
+    effective temperature and luminosity.
     
     Parameters
     ----------
@@ -97,11 +107,15 @@ def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s):
     fluxes : `~numpy.ndarray`
         Array of fluxes at cadence ``cadence`` of length ``size``.
     kernel : `~celerite.terms.TermSum`
-        Celerite kernel used to approximate the stellar PSD.
+        Celerite kernel used to approximate the stellar power spectrum.
     """
     global parameter_vector
     parameter_vector = np.copy(parameter_vector)
-    
+
+    ##########################
+    # Scale p-mode frequencies
+    ##########################
+
     tunable_amps = np.exp(parameter_vector[::3][2:])
     tunable_freqs = np.exp(parameter_vector[2::3][2:]) * 1e6/2/np.pi
     peak_ind = np.argmax(tunable_amps)
@@ -124,7 +138,20 @@ def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s):
     new_log_omegas = np.log(2*np.pi*new_freqs*1e-6).value
 
     parameter_vector[2::3][2:] = new_log_omegas
-    
+
+    #############################
+    # Scale granulation frequency
+    #############################
+
+    tau_eff_factor = (new_peak_freq/peak_freq)**-0.89
+    granulation_amplitude_factor = (new_peak_freq/peak_freq)**-0.5
+    parameter_vector[4] = np.log(np.exp(parameter_vector[4]) * tau_eff_factor)
+    parameter_vector[3] = np.log(np.exp(parameter_vector[3]) * granulation_amplitude_factor)
+
+    ##########################
+    # Assemble celerite kernel
+    ##########################
+
     nterms = len(parameter_vector)//3
 
     kernel = terms.SHOTerm(log_S0=0, log_omega0=0, log_Q=0) 
@@ -138,6 +165,11 @@ def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s):
 
     x = np.arange(0, size//500, cadence.to(u.s).value) 
     gp.compute(x, check_sorted=False)
+
+
+    ###################################
+    # Get samples with the kernel's PSD
+    ###################################
 
     y = gp.sample(500)
     
