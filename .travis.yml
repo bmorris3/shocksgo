@@ -97,7 +97,7 @@ matrix:
 
         # Do a PEP8 test with flake8
         - os: linux
-          env: MAIN_CMD='flake8 arcesetc --count --show-source --statistics $FLAKE8_OPT' SETUP_CMD=''
+          env: MAIN_CMD='flake8 shocksgo --count --show-source --statistics $FLAKE8_OPT' SETUP_CMD=''
 
 install:
 
@@ -130,4 +130,4 @@ script:
 after_success:
     # If coveralls.io is set up for this package, uncomment the line below.
     # The coveragerc file may be customized as needed for your package.
-    # - if [[ $SETUP_CMD == *coverage* ]]; then coveralls --rcfile='arcesetc/tests/coveragerc'; fi
+    # - if [[ $SETUP_CMD == *coverage* ]]; then coveralls --rcfile='shocksgo/tests/coveragerc'; fi

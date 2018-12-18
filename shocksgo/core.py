@@ -29,7 +29,10 @@ def generate_solar_fluxes(size, cadence=60*u.s):
     -------
     fluxes : `~numpy.ndarray`
         Array of fluxes at cadence ``cadence`` of length ``size``.
+    kernel : `~celerite.terms.TermSum`
+        Celerite kernel used to approximate the solar PSD.
     """
+    global parameter_vector
     nterms = len(parameter_vector)//3
 
     kernel = terms.SHOTerm(log_S0=0, log_omega0=0, log_Q=0) 
@@ -59,6 +62,7 @@ def generate_solar_fluxes(size, cadence=60*u.s):
         else: 
             offset = yi[0] - y_concatenated[i-1][-1]
             y_concatenated.append(yi - offset)
+
     y_concatenated = np.hstack(y_concatenated)
     
     x_c = np.arange(len(y_concatenated))
@@ -92,6 +96,8 @@ def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s):
     -------
     fluxes : `~numpy.ndarray`
         Array of fluxes at cadence ``cadence`` of length ``size``.
+    kernel : `~celerite.terms.TermSum`
+        Celerite kernel used to approximate the stellar PSD.
     """
     global parameter_vector
     parameter_vector = np.copy(parameter_vector)
@@ -102,19 +108,17 @@ def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s):
     peak_freq = tunable_freqs[peak_ind]
     delta_freqs = tunable_freqs - peak_freq
     
-    T_eff_solar = 5777 * u.K 
-    nu_max_sun = peak_freq * u.uHz
-    delta_nu_sun = 135.1 * u.uHz
+    T_eff_solar = 5777 * u.K
     
     # Huber 2011 Eqn 1
     nu_factor = ( (M/M_sun) * (T_eff/T_eff_solar)**3.5 / (L/L_sun) )
     # Huber 2011 Eqn 2
-    delta_nu_factor = ( (M/M_sun)**0.5 * (T_eff/T_eff_solar)**3 / (L/L_sun)**0.75 )
+    delta_nu_factor = ( (M/M_sun)**0.5 * (T_eff/T_eff_solar)**3 /
+                        (L/L_sun)**0.75 )
     
     new_peak_freq = nu_factor * peak_freq
     new_delta_freqs = delta_freqs * delta_nu_factor
 
-    new_peak_freq, new_delta_freqs
     new_freqs = new_peak_freq + new_delta_freqs
 
     new_log_omegas = np.log(2*np.pi*new_freqs*1e-6).value
@@ -150,11 +154,13 @@ def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s):
         else: 
             offset = yi[0] - y_concatenated[i-1][-1]
             y_concatenated.append(yi - offset)
+
     y_concatenated = np.hstack(y_concatenated)
     
     x_c = np.arange(len(y_concatenated))
     
-    y_concatenated -= np.polyval(np.polyfit(x_c - x_c.mean(), y_concatenated, 1), 
+    y_concatenated -= np.polyval(np.polyfit(x_c - x_c.mean(),
+                                            y_concatenated, 1),
                                  x_c - x_c.mean())
     
     return y_concatenated, kernel
