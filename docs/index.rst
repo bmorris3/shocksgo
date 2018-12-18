@@ -76,6 +76,11 @@ found in
 
 .. math::
 
-    \tau_\textrm{eff} \propto \nu^{-0.89}_\textrm{max}
+    \tau_\textrm{eff} \propto \nu^{-0.89}_\textrm{max},
 
-where :math:`\tau_\textrm{eff}` is the characteristic granulation timescale.
+where :math:`\tau_\textrm{eff}` is the characteristic granulation timescale. The
+amplitude of the granulation scales as
+
+.. math::
+
+    a \propto \nu^{-0.5}_\textrm{max}.
