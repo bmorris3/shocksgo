@@ -18,7 +18,7 @@ Generate light curves of the Sun and stars accounting for the effects of granula
 License
 -------
 
-This project is Copyright (c) Brett Morris & Trevor Dorn-Wallenstein and licensed under
+This project is Copyright (c) Brett Morris and licensed under
 the terms of the MIT license. This package is based upon
 the `Astropy package template <https://github.com/astropy/package-template>`_
 which is licensed under the BSD 3-clause licence. See the licenses folder for

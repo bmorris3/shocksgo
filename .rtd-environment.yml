@@ -11,4 +11,5 @@ dependencies:
     - numpy
     - sphinx-astropy
     - pip:
+       - pybind11
        - celerite
