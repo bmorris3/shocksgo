@@ -15,6 +15,8 @@ shocksgo: Simple Harmonic Oscillator celerite kernels for stellar granulation an
 Generate light curves of the Sun and stars accounting for the effects of granulation, supergranulation and p-mode oscillations. 
 
 
+For more information, `read the docs <https://shocksgo.readthedocs.io/>`_.
+
 License
 -------
 

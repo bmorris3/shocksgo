@@ -95,10 +95,6 @@ matrix:
         - os: linux
           env: NUMPY_VERSION=1.14
 
-        # Do a PEP8 test with flake8
-        - os: linux
-          env: MAIN_CMD='flake8 shocksgo --count --show-source --statistics $FLAKE8_OPT' SETUP_CMD=''
-
 install:
 
     # We now use the ci-helpers package to set up our testing environment.

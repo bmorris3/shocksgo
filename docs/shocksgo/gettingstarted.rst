@@ -36,6 +36,7 @@ We can check that the power spectrum of the fluxes that we've generated
 reproduce the solar power spectrum::
 
     import matplotlib.pyplot as plt
+    import numpy as np
     import astropy.units as u
     from scipy.signal import periodogram
 
@@ -49,6 +50,7 @@ reproduce the solar power spectrum::
     plt.loglog(freq * 1e6, 2*np.pi*kernel.get_psd(2*np.pi*freq), alpha=0.7, label='Kernel')
     plt.ylim([1e-10, 1e0])
     plt.xlim([1e-2, 1e4])
+    plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power')
     plt.show()
 
 
@@ -110,7 +112,7 @@ following::
 
     # Stellar properties
     M = 0.9 * M_sun
-    T_eff = 5340
+    T_eff = 5340 * u.K
     L = 0.56 * L_sun
 
     fluxes, kernel = generate_stellar_fluxes(size=1e7, M=M, T_eff=T_eff, L=L, cadence=60*u.s)
