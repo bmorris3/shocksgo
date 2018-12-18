@@ -12,7 +12,7 @@ x = np.arange(len(y)) / 60 / 24
 
 fig, ax = plt.subplots(3, 2, figsize=(14, 8))
 ax[0, 0].plot(x, y)
-ax[0, 0].set(xlabel='Time [day]', ylabel='Flux')
+ax[0, 0].set(xlabel='Time [day]', ylabel='Flux', title='Sun')
 
 ftest, Ptest = periodogram(y, fs=1/60)
 
@@ -33,7 +33,7 @@ y, kernel = generate_stellar_fluxes(5e7, Mstar, Teffstar, Lstar, cadence=60*u.s)
 x = np.arange(len(y)) / 60 / 24
 
 ax[1, 0].plot(x, y)
-ax[1, 0].set(xlabel='Time [day]', ylabel='Flux')
+ax[1, 0].set(xlabel='Time [day]', ylabel='Flux', title='Kepler-62')
 
 ftest, Ptest = periodogram(y, fs=1/60)
 
@@ -54,7 +54,7 @@ y, kernel = generate_stellar_fluxes(1e7, Mstar, Teffstar, Lstar, cadence=1*u.s)
 x = np.arange(len(y)) / 60 / 60 / 24
 
 ax[2, 0].plot(x, y)
-ax[2, 0].set(xlabel='Time [day]', ylabel='Flux')
+ax[2, 0].set(xlabel='Time [day]', ylabel='Flux', title='Kepler-296')
 
 ftest, Ptest = periodogram(y, fs=1)
 

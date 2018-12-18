@@ -116,8 +116,9 @@ def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s):
     # Scale p-mode frequencies
     ##########################
 
+    # Scale frequencies
     tunable_amps = np.exp(parameter_vector[::3][2:])
-    tunable_freqs = np.exp(parameter_vector[2::3][2:]) * 1e6/2/np.pi
+    tunable_freqs = np.exp(parameter_vector[1::3][2:]) * 1e6/2/np.pi
     peak_ind = np.argmax(tunable_amps)
     peak_freq = tunable_freqs[peak_ind]
     delta_freqs = tunable_freqs - peak_freq
@@ -137,7 +138,21 @@ def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s):
 
     new_log_omegas = np.log(2*np.pi*new_freqs*1e-6).value
 
-    parameter_vector[2::3][2:] = new_log_omegas
+    parameter_vector[1::3][2:] = new_log_omegas
+
+    # Scale amplitudes
+    c = (T_eff/(5934 * u.K))**0.8
+    c_sun = ((5777 * u.K)/(5934 * u.K))**0.8
+    s = 0.886
+    r = 2
+    t = 1.89
+    pmode_amp_factor = (L/L_sun)**s / ((M/M_sun)**t * T_eff.value**(r-1) * c)
+    pmode_amp_factor_sun = (L_sun/L_sun)**s / ((M_sun/M_sun)**t * 5777**(r-1)
+                                               * c_sun)
+
+    new_pmode_amps = np.log(np.exp(parameter_vector[0::3][2:]) *
+                            pmode_amp_factor/pmode_amp_factor_sun)
+    parameter_vector[0::3][2:] = new_pmode_amps
 
     #############################
     # Scale granulation frequency
@@ -146,7 +161,8 @@ def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s):
     tau_eff_factor = (new_peak_freq/peak_freq)**-0.89
     granulation_amplitude_factor = (new_peak_freq/peak_freq)**-0.5
     parameter_vector[4] = np.log(np.exp(parameter_vector[4]) * tau_eff_factor)
-    parameter_vector[3] = np.log(np.exp(parameter_vector[3]) * granulation_amplitude_factor)
+    parameter_vector[3] = np.log(np.exp(parameter_vector[3]) *
+                                 granulation_amplitude_factor)
 
     ##########################
     # Assemble celerite kernel

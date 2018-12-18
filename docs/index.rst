@@ -51,21 +51,33 @@ Scaling relations for p-modes
 For computation of stellar p-mode oscillation frequencies, we use the scaling
 relations found in
 `Huber et al. (2011) <http://adsabs.harvard.edu/abs/2011ApJ...743..143H>`_ and
-references therein (e.g. Kjeldsen & Bedding 1995), namely:
+references therein (e.g. Kjeldsen & Bedding 1995), namely Equation 1:
 
 .. math::
 
     \nu_\textrm{max} \approx \frac{M / M_\odot (T_\textrm{eff}/
     T_{\textrm{eff},\odot})^{3.5} }{L/L_\odot} \nu_{\textrm{max}, \odot}
 
-(Equation 1), and
+and Equation 2
 
 .. math::
 
     \Delta \nu_\textrm{max} \approx \frac{(M / M_\odot)^{0.5} (T_\textrm{eff}/
-    T_{\textrm{eff},\odot})^{3} }{(L/L_\odot)^{0.75}} \Delta \nu_{\odot}
+    T_{\textrm{eff},\odot})^{3} }{(L/L_\odot)^{0.75}} \Delta \nu_{\odot}.
 
-(Equation 2).
+
+The amplitude scaling of the p-mode oscillations is given by Equation 9:
+
+.. math::
+
+    A \propto \frac{L^s}{M^t T_\textrm{eff}^{r-1} c(T_\textrm{eff})}
+
+where :math:`r = 2`, :math:`s = 0.886`, :math:`t = 1.89` and
+
+.. math::
+
+    c(T_\textrm{eff}) = \left( \frac{T_\textrm{eff}}{5934 \textrm{K}} \right)^{0.8}.
+
 
 Scaling relations for granulation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
