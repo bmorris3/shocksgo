@@ -1,11 +1,14 @@
 Getting Started
 ===============
 
+This tutorial will show some examples of how to make solar and stellar light
+curves using ``shocksgo``.
+
 Generating a Solar Light Curve
 ------------------------------
 
-To generate a sample of 1e5 solar fluxes at 60 second cadence, we can do the
-following::
+To generate a sample of 1e5 solar fluxes at 60 second cadence, we can use
+`~shocksgo.generate_solar_fluxes`::
 
     import matplotlib.pyplot as plt
     import astropy.units as u
@@ -16,20 +19,23 @@ following::
 
     times = np.arange(len(fluxes))
 
-    plt.plot(times, fluxes)
-    plt.gca().set(xlabel='Time [minutes]', ylabel='Relative Flux')
+    plt.plot(times, 1e6 * fluxes)
+    plt.gca().set(xlabel='Time [minutes]', ylabel='Relative Flux [ppm]')
     plt.show()
 
 .. plot::
 
     import matplotlib.pyplot as plt
     import astropy.units as u
+
     from shocksgo import generate_solar_fluxes
 
     fluxes, kernel = generate_solar_fluxes(size=1e5, cadence=60*u.s)
 
-    plt.plot(fluxes)
-    plt.gca().set(xlabel='Time [minutes]', ylabel='Relative Flux')
+    times = np.arange(len(fluxes))
+
+    plt.plot(times, 1e6 * fluxes)
+    plt.gca().set(xlabel='Time [minutes]', ylabel='Relative Flux [ppm]')
     plt.show()
 
 We can check that the power spectrum of the fluxes that we've generated
@@ -101,8 +107,8 @@ Generating a Stellar Light Curve
 --------------------------------
 
 
-To generate a sample of 1e5 *steller* fluxes at 60 second cadence, we can do the
-following::
+To generate a sample of 1e5 *steller* fluxes at 60 second cadence, we can use
+`~shocksgo.generate_stellar_fluxes`::
 
     import matplotlib.pyplot as plt
     import astropy.units as u
@@ -119,8 +125,8 @@ following::
 
     times = np.arange(len(fluxes)) / 60 / 24
 
-    plt.plot(times, fluxes)
-    plt.gca().set(xlabel='Time [days]', ylabel='Relative Flux', title='G9V star')
+    plt.plot(times, 1e6 * fluxes)
+    plt.gca().set(xlabel='Time [days]', ylabel='Relative Flux [ppm]', title='G9V star')
     plt.show()
 
 .. plot::
@@ -140,8 +146,8 @@ following::
 
     times = np.arange(len(fluxes)) / 60 / 24
 
-    plt.plot(times, fluxes)
-    plt.gca().set(xlabel='Time [days]', ylabel='Relative Flux', title='G9V star')
+    plt.plot(times, 1e6 * fluxes)
+    plt.gca().set(xlabel='Time [days]', ylabel='Relative Flux [ppm]', title='G9V star')
     plt.show()
 
 We can see the shift in the p-mode oscillations relative to the solar ones above
@@ -160,9 +166,9 @@ if we plot the power spectrum::
     T_eff = 5340 * u.K
     L = 0.56 * L_sun
 
-    fluxes, kernel = generate_stellar_fluxes(size=1e7, M=M, T_eff=T_eff, L=L, cadence=60*u.s)
+    fluxes, kernel = generate_stellar_fluxes(size=1e7, M=M, T_eff=T_eff, L=L, cadence=1*u.s)
 
-    freq, power = periodogram(fluxes, fs=1/60)
+    freq, power = periodogram(fluxes, fs=1)
 
     plt.semilogy(freq * 1e6, power, ',', label='Samples')
     plt.semilogy(freq * 1e6, 2*np.pi*kernel.get_psd(2*np.pi*freq), alpha=0.7, label='Kernel')
@@ -187,9 +193,9 @@ if we plot the power spectrum::
     T_eff = 5340 * u.K
     L = 0.56 * L_sun
 
-    fluxes, kernel = generate_stellar_fluxes(size=1e7, M=M, T_eff=T_eff, L=L, cadence=60*u.s)
+    fluxes, kernel = generate_stellar_fluxes(size=1e7, M=M, T_eff=T_eff, L=L, cadence=1*u.s)
 
-    freq, power = periodogram(fluxes, fs=1/60)
+    freq, power = periodogram(fluxes, fs=1)
 
     plt.semilogy(freq * 1e6, power, ',', label='Samples')
     plt.semilogy(freq * 1e6, 2*np.pi*kernel.get_psd(2*np.pi*freq), alpha=0.7, label='Kernel')

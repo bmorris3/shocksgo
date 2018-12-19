@@ -118,7 +118,7 @@ def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s):
 
     # Scale frequencies
     tunable_amps = np.exp(parameter_vector[::3][2:])
-    tunable_freqs = np.exp(parameter_vector[1::3][2:]) * 1e6/2/np.pi
+    tunable_freqs = np.exp(parameter_vector[2::3][2:]) * 1e6/2/np.pi
     peak_ind = np.argmax(tunable_amps)
     peak_freq = tunable_freqs[peak_ind]
     delta_freqs = tunable_freqs - peak_freq
@@ -138,7 +138,7 @@ def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s):
 
     new_log_omegas = np.log(2*np.pi*new_freqs*1e-6).value
 
-    parameter_vector[1::3][2:] = new_log_omegas
+    parameter_vector[2::3][2:] = new_log_omegas
 
     # Scale amplitudes
     c = (T_eff/(5934 * u.K))**0.8
