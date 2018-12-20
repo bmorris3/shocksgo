@@ -158,8 +158,8 @@ def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s):
     # Scale granulation frequency
     #############################
 
-    tau_eff_factor = (new_peak_freq/peak_freq)**-0.89
-    granulation_amplitude_factor = (new_peak_freq/peak_freq)**-0.5
+    tau_eff_factor = (new_peak_freq/peak_freq)**0.89
+    granulation_amplitude_factor = (new_peak_freq/peak_freq)**0.5
     parameter_vector[4] = np.log(np.exp(parameter_vector[4]) * tau_eff_factor)
     parameter_vector[3] = np.log(np.exp(parameter_vector[3]) *
                                  granulation_amplitude_factor)
@@ -170,16 +170,16 @@ def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s):
 
     nterms = len(parameter_vector)//3
 
-    kernel = terms.SHOTerm(log_S0=0, log_omega0=0, log_Q=0) 
+    kernel = terms.SHOTerm(log_S0=0, log_omega0=0, log_Q=0)
 
-    for term in range(nterms-1): 
+    for term in range(nterms-1):
         kernel += terms.SHOTerm(log_S0=0, log_omega0=0, log_Q=0)
 
     kernel.set_parameter_vector(parameter_vector)
 
     gp = celerite.GP(kernel)
 
-    x = np.arange(0, size//500, cadence.to(u.s).value) 
+    x = np.arange(0, size//500, cadence.to(u.s).value)
     gp.compute(x, check_sorted=False)
 
 
@@ -188,28 +188,27 @@ def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s):
     ###################################
 
     y = gp.sample(500)
-    
+
     y_concatenated = []
 
-    for i, yi in enumerate(y): 
+    for i, yi in enumerate(y):
         xi = np.arange(len(yi))
-        fit = np.polyval(np.polyfit(xi - xi.mean(), yi, 1), 
+        fit = np.polyval(np.polyfit(xi - xi.mean(), yi, 1),
                          xi-xi.mean())
         yi -= fit
 
-        if i == 0: 
+        if i == 0:
             y_concatenated.append(yi)
-        else: 
+        else:
             offset = yi[0] - y_concatenated[i-1][-1]
             y_concatenated.append(yi - offset)
 
     y_concatenated = np.hstack(y_concatenated)
-    
+
     x_c = np.arange(len(y_concatenated))
-    
+
     y_concatenated -= np.polyval(np.polyfit(x_c - x_c.mean(),
                                             y_concatenated, 1),
                                  x_c - x_c.mean())
-    
-    return y_concatenated, kernel
 
+    return y_concatenated, kernel
