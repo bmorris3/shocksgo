@@ -13,7 +13,8 @@ parameter_vector = np.loadtxt(os.path.join(dirname, 'data',
 
 
 @u.quantity_input(cadence=u.s)
-def generate_solar_fluxes(size, cadence=60*u.s):
+def generate_solar_fluxes(size, cadence=60*u.s,
+                          parameter_vector=parameter_vector):
     """
     Generate an array of fluxes with zero mean which mimic the power spectrum of
     the SOHO/VIRGO SPM observations.
@@ -32,11 +33,10 @@ def generate_solar_fluxes(size, cadence=60*u.s):
     kernel : `~celerite.terms.TermSum`
         Celerite kernel used to approximate the solar power spectrum.
     """
-    global parameter_vector
-
     ##########################
     # Assemble celerite kernel
     ##########################
+    parameter_vector = np.copy(parameter_vector)
 
     nterms = len(parameter_vector)//3
 
@@ -83,7 +83,8 @@ def generate_solar_fluxes(size, cadence=60*u.s):
 
 
 @u.quantity_input(cadence=u.s, M=u.kg, T_eff=u.K, L=u.W)
-def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s):
+def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s,
+                            parameter_vector=parameter_vector):
     """
     Generate an array of fluxes with zero mean which mimic the power spectrum of
     the SOHO/VIRGO SPM observations, scaled for a star with a given mass,
@@ -109,12 +110,10 @@ def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s):
     kernel : `~celerite.terms.TermSum`
         Celerite kernel used to approximate the stellar power spectrum.
     """
-    global parameter_vector
-    parameter_vector = np.copy(parameter_vector)
-
     ##########################
     # Scale p-mode frequencies
     ##########################
+    parameter_vector = np.copy(parameter_vector)
 
     # Scale frequencies
     tunable_amps = np.exp(parameter_vector[::3][2:])
@@ -158,8 +157,8 @@ def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s):
     # Scale granulation frequency
     #############################
 
-    tau_eff_factor = (new_peak_freq/peak_freq)**0.89
-    granulation_amplitude_factor = (new_peak_freq/peak_freq)**0.5
+    tau_eff_factor = (new_peak_freq/peak_freq)**-0.89
+    granulation_amplitude_factor = (new_peak_freq/peak_freq)**-0.5
     parameter_vector[4] = np.log(np.exp(parameter_vector[4]) * tau_eff_factor)
     parameter_vector[3] = np.log(np.exp(parameter_vector[3]) *
                                  granulation_amplitude_factor)
