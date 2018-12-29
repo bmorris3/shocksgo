@@ -157,9 +157,9 @@ def generate_stellar_fluxes(size, M, T_eff, L, cadence=60*u.s,
     # Scale granulation frequency
     #############################
 
-    tau_eff_factor = (new_peak_freq/peak_freq)**-0.89
+    tau_eff_factor = (new_peak_freq/peak_freq)**0.89
     granulation_amplitude_factor = (new_peak_freq/peak_freq)**-0.5
-    parameter_vector[4] = np.log(np.exp(parameter_vector[4]) * tau_eff_factor)
+    parameter_vector[5] = np.log(np.exp(parameter_vector[5]) * tau_eff_factor)
     parameter_vector[3] = np.log(np.exp(parameter_vector[3]) *
                                  granulation_amplitude_factor)
 
