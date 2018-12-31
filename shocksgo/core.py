@@ -52,8 +52,8 @@ def generate_solar_fluxes(duration, cadence=60*u.s,
     gp = celerite.GP(kernel)
 
     # For more efficient computation for large datasets, split into chunks:
-    if duration.to(u.s).value >= 1e5:
-        divisor = 500
+    if duration.to(u.s).value >= 1e6:
+        divisor = 10000
         x = np.arange(0, duration.to(u.s).value//divisor, cadence.to(u.s).value)
         times = np.arange(0, duration.to(u.s).value,
                           cadence.to(u.s).value) * u.s
@@ -180,8 +180,8 @@ def generate_stellar_fluxes(duration, M, T_eff, R, L, cadence=60*u.s,
 
     # Kallinger 2014 pg 12:
     tau_eff_factor = (new_peak_freq/peak_freq)**-0.89
-    # Kallinger 2014 pg 12:
-    granulation_amplitude_factor = (new_peak_freq/peak_freq)**-0.56
+    # Kjeldsen & Bedding (2011):
+    granulation_amplitude_factor = (new_peak_freq/peak_freq)**-2
     parameter_vector[5] = np.log(np.exp(parameter_vector[5]) / tau_eff_factor)
     parameter_vector[3] = np.log(np.exp(parameter_vector[3]) *
                                  granulation_amplitude_factor)
