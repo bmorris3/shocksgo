@@ -2,6 +2,7 @@ import numpy as np
 
 __all__ = ['interpolate_missing_data']
 
+
 def interpolate_missing_data(times, fluxes, cadences=None):
     """
     Assuming ``times`` are uniformly spaced with missing cadences,

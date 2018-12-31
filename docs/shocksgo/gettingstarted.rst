@@ -7,7 +7,7 @@ curves using ``shocksgo``.
 Generating a Solar Light Curve
 ------------------------------
 
-To generate a sample of 1e5 solar fluxes at 60 second cadence, we can use
+To generate a sample of ten houros of solar fluxes at 60 second cadence, we can use
 `~shocksgo.generate_solar_fluxes`::
 
     import matplotlib.pyplot as plt
@@ -15,12 +15,10 @@ To generate a sample of 1e5 solar fluxes at 60 second cadence, we can use
 
     from shocksgo import generate_solar_fluxes
 
-    fluxes, kernel = generate_solar_fluxes(size=1e5, cadence=60*u.s)
+    times, fluxes, kernel = generate_solar_fluxes(duration=10*u.hour, cadence=60*u.s)
 
-    times = np.arange(len(fluxes))
-
-    plt.plot(times, 1e6 * fluxes)
-    plt.gca().set(xlabel='Time [minutes]', ylabel='Relative Flux [ppm]')
+    plt.plot(times.to(u.hour), 1e6 * fluxes)
+    plt.gca().set(xlabel='Time [hours]', ylabel='Relative Flux [ppm]')
     plt.show()
 
 .. plot::
@@ -30,12 +28,10 @@ To generate a sample of 1e5 solar fluxes at 60 second cadence, we can use
 
     from shocksgo import generate_solar_fluxes
 
-    fluxes, kernel = generate_solar_fluxes(size=1e5, cadence=60*u.s)
+    times, fluxes, kernel = generate_solar_fluxes(duration=10*u.hour, cadence=60*u.s)
 
-    times = np.arange(len(fluxes))
-
-    plt.plot(times, 1e6 * fluxes)
-    plt.gca().set(xlabel='Time [minutes]', ylabel='Relative Flux [ppm]')
+    plt.plot(times.to(u.hour), 1e6 * fluxes)
+    plt.gca().set(xlabel='Time [hours]', ylabel='Relative Flux [ppm]')
     plt.show()
 
 We can check that the power spectrum of the fluxes that we've generated
@@ -44,17 +40,17 @@ reproduce the solar power spectrum::
     import matplotlib.pyplot as plt
     import numpy as np
     import astropy.units as u
-    from scipy.signal import periodogram
+    from shocksgo import power_spectrum
 
     from shocksgo import generate_solar_fluxes
 
-    fluxes, kernel = generate_solar_fluxes(size=1e7, cadence=60*u.s)
+    times, fluxes, kernel = generate_solar_fluxes(duration=100*u.day, cadence=60*u.s)
 
-    freq, power = periodogram(fluxes, fs=1/60)
+    freq, power = power_spectrum(fluxes, d=60)
 
     plt.loglog(freq * 1e6, power, ',', label='Samples')
-    plt.loglog(freq * 1e6, 2*np.pi*kernel.get_psd(2*np.pi*freq), alpha=0.7, label='Kernel')
-    plt.ylim([1e-10, 1e0])
+    plt.loglog(freq * 1e6, kernel.get_psd(2*np.pi*freq)/(2*np.pi), alpha=0.7, label='Kernel')
+    plt.ylim([1e-12, 1e-2])
     plt.xlim([1e-2, 1e4])
     plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power')
     plt.show()
@@ -65,17 +61,17 @@ reproduce the solar power spectrum::
     import matplotlib.pyplot as plt
     import numpy as np
     import astropy.units as u
-    from scipy.signal import periodogram
+    from shocksgo import power_spectrum
 
     from shocksgo import generate_solar_fluxes
 
-    fluxes, kernel = generate_solar_fluxes(size=1e7, cadence=60*u.s)
+    times, fluxes, kernel = generate_solar_fluxes(duration=100*u.day, cadence=60*u.s)
 
-    freq, power = periodogram(fluxes, fs=1/60)
+    freq, power = power_spectrum(fluxes, d=60)
 
     plt.loglog(freq * 1e6, power, ',', label='Samples')
-    plt.loglog(freq * 1e6, 2*np.pi*kernel.get_psd(2*np.pi*freq), alpha=0.7, label='Kernel')
-    plt.ylim([1e-10, 1e0])
+    plt.loglog(freq * 1e6, kernel.get_psd(2*np.pi*freq)/(2*np.pi), alpha=0.7, label='Kernel')
+    plt.ylim([1e-12, 1e-2])
     plt.xlim([1e-2, 1e4])
     plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power')
     plt.show()
@@ -87,17 +83,17 @@ Zooming into the p-mode oscillations, we can see the peaks are reproduced:
     import matplotlib.pyplot as plt
     import numpy as np
     import astropy.units as u
-    from scipy.signal import periodogram
+    from shocksgo import power_spectrum
 
     from shocksgo import generate_solar_fluxes
 
-    fluxes, kernel = generate_solar_fluxes(size=5e7, cadence=60*u.s)
+    times, fluxes, kernel = generate_solar_fluxes(duration=100*u.day, cadence=60*u.s)
 
-    freq, power = periodogram(fluxes, fs=1/60)
+    freq, power = power_spectrum(fluxes, d=60)
 
     plt.semilogy(freq * 1e6, power, ',', label='Samples')
-    plt.semilogy(freq * 1e6, 2*np.pi*kernel.get_psd(2*np.pi*freq), alpha=0.7, label='Kernel')
-    plt.ylim([1e-8, 1e-4])
+    plt.semilogy(freq * 1e6, kernel.get_psd(2*np.pi*freq)/(2*np.pi), alpha=0.7, label='Kernel')
+    plt.ylim([1e-11, 1e-7])
     plt.xlim([2000, 4000])
     plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power')
     plt.show()
@@ -107,12 +103,12 @@ Generating a Stellar Light Curve
 --------------------------------
 
 
-To generate a sample of 1e5 *steller* fluxes at 60 second cadence, we can use
+To generate a sample of *steller* fluxes at 60 second cadence, we can use
 `~shocksgo.generate_stellar_fluxes`::
 
     import matplotlib.pyplot as plt
     import astropy.units as u
-    from astropy.constants import M_sun, L_sun
+    from astropy.constants import M_sun, L_sun, R_sun
 
     from shocksgo import generate_stellar_fluxes
 
@@ -120,12 +116,11 @@ To generate a sample of 1e5 *steller* fluxes at 60 second cadence, we can use
     M = 0.9 * M_sun
     T_eff = 5340 * u.K
     L = 0.56 * L_sun
+    R = 0.7 * R_sun
 
-    fluxes, kernel = generate_stellar_fluxes(size=1e7, M=M, T_eff=T_eff, L=L, cadence=60*u.s)
+    times, fluxes, kernel = generate_stellar_fluxes(duration=100*u.day, M=M, T_eff=T_eff, R=R, L=L, cadence=60*u.s)
 
-    times = np.arange(len(fluxes)) / 60 / 24
-
-    plt.plot(times, 1e6 * fluxes)
+    plt.plot(times.to(u.day), 1e6 * fluxes)
     plt.gca().set(xlabel='Time [days]', ylabel='Relative Flux [ppm]', title='G9V star')
     plt.show()
 
@@ -133,7 +128,7 @@ To generate a sample of 1e5 *steller* fluxes at 60 second cadence, we can use
 
     import matplotlib.pyplot as plt
     import astropy.units as u
-    from astropy.constants import M_sun, L_sun
+    from astropy.constants import M_sun, L_sun, R_sun
 
     from shocksgo import generate_stellar_fluxes
 
@@ -141,12 +136,11 @@ To generate a sample of 1e5 *steller* fluxes at 60 second cadence, we can use
     M = 0.9 * M_sun
     T_eff = 5340 * u.K
     L = 0.56 * L_sun
+    R = 0.7 * R_sun
 
-    fluxes, kernel = generate_stellar_fluxes(size=1e7, M=M, T_eff=T_eff, L=L, cadence=60*u.s)
+    times, fluxes, kernel = generate_stellar_fluxes(duration=100*u.day, M=M, T_eff=T_eff, R=R, L=L, cadence=60*u.s)
 
-    times = np.arange(len(fluxes)) / 60 / 24
-
-    plt.plot(times, 1e6 * fluxes)
+    plt.plot(times.to(u.day), 1e6 * fluxes)
     plt.gca().set(xlabel='Time [days]', ylabel='Relative Flux [ppm]', title='G9V star')
     plt.show()
 
@@ -156,24 +150,24 @@ if we plot the power spectrum::
     import matplotlib.pyplot as plt
     import numpy as np
     import astropy.units as u
-    from scipy.signal import periodogram
-    from astropy.constants import M_sun, L_sun
+    from astropy.constants import M_sun, L_sun, R_sun
 
-    from shocksgo import generate_stellar_fluxes
+    from shocksgo import generate_stellar_fluxes, power_spectrum
 
     # Stellar properties
     M = 0.9 * M_sun
     T_eff = 5340 * u.K
     L = 0.56 * L_sun
+    R = 0.876 * R_sun
 
-    fluxes, kernel = generate_stellar_fluxes(size=1e7, M=M, T_eff=T_eff, L=L, cadence=1*u.s)
+    times, fluxes, kernel = generate_stellar_fluxes(duration=10*u.day, M=M, T_eff=T_eff, R=R, L=L, cadence=60*u.s)
 
-    freq, power = periodogram(fluxes, fs=1)
+    freq, power = power_spectrum(fluxes, d=60)
 
     plt.semilogy(freq * 1e6, power, ',', label='Samples')
-    plt.semilogy(freq * 1e6, 2*np.pi*kernel.get_psd(2*np.pi*freq), alpha=0.7, label='Kernel')
-    plt.ylim([1e-8, 1e-4])
-    plt.xlim([3000, 6000])
+    plt.semilogy(freq * 1e6, kernel.get_psd(2*np.pi*freq)/(2*np.pi), alpha=0.7, label='Kernel')
+    plt.ylim([1e-12, 1e-6])
+    plt.xlim([2500, 5000])
     plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power')
     plt.show()
 
@@ -183,23 +177,23 @@ if we plot the power spectrum::
     import matplotlib.pyplot as plt
     import numpy as np
     import astropy.units as u
-    from scipy.signal import periodogram
-    from astropy.constants import M_sun, L_sun
+    from astropy.constants import M_sun, L_sun, R_sun
 
-    from shocksgo import generate_stellar_fluxes
+    from shocksgo import generate_stellar_fluxes, power_spectrum
 
     # Stellar properties
     M = 0.9 * M_sun
     T_eff = 5340 * u.K
     L = 0.56 * L_sun
+    R = 0.876 * R_sun
 
-    fluxes, kernel = generate_stellar_fluxes(size=1e7, M=M, T_eff=T_eff, L=L, cadence=1*u.s)
+    times, fluxes, kernel = generate_stellar_fluxes(duration=10*u.day, M=M, T_eff=T_eff, R=R, L=L, cadence=60*u.s)
 
-    freq, power = periodogram(fluxes, fs=1)
+    freq, power = power_spectrum(fluxes, d=60)
 
     plt.semilogy(freq * 1e6, power, ',', label='Samples')
-    plt.semilogy(freq * 1e6, 2*np.pi*kernel.get_psd(2*np.pi*freq), alpha=0.7, label='Kernel')
-    plt.ylim([1e-8, 1e-4])
-    plt.xlim([3000, 6000])
+    plt.semilogy(freq * 1e6, kernel.get_psd(2*np.pi*freq)/(2*np.pi), alpha=0.7, label='Kernel')
+    plt.ylim([1e-12, 1e-6])
+    plt.xlim([2500, 5000])
     plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power')
     plt.show()

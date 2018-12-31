@@ -33,7 +33,8 @@ We compute these light curves efficiently by taking advantage of
 `celerite <http://celerite.readthedocs.io>`_, a fast Gaussian process regression
 package, which we use to approximate solar and stellar power spectrum densities
 with sums of
-`simple harmonic oscillator <https://celerite.readthedocs.io/en/stable/python/kernel/#celerite.terms.SHOTerm>`_
+`simple harmonic oscillator
+<https://celerite.readthedocs.io/en/stable/python/kernel/#celerite.terms.SHOTerm>`_
 (SHO) kernels of the form:
 
 .. math::
@@ -43,30 +44,32 @@ with sums of
 
 where :math:`\omega = 2\pi f` is the angular frequency. We use one
 SHO kernel term for super/meso-granulation, another for ordinary granulation,
-and about 100 terms for the comb of p-mode peaks.
+and about 50 terms for the comb of p-mode peaks.
 
 Scaling relations for p-modes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For computation of stellar p-mode oscillation frequencies, we use the scaling
 relations found in
-`Huber et al. (2011) <http://adsabs.harvard.edu/abs/2011ApJ...743..143H>`_ and
-references therein (e.g. Kjeldsen & Bedding 1995), namely Equation 1:
+`Huber et al. (2012) <http://adsabs.harvard.edu/abs/2012ApJ...760...32H>`_ and
+references therein
+(e.g. `Kjeldsen & Bedding 1995
+<http://adsabs.harvard.edu/abs/1995A%26A...293...87K>`_ ),
+namely Equation 4:
 
 .. math::
 
-    \nu_\textrm{max} \approx \frac{M / M_\odot (T_\textrm{eff}/
-    T_{\textrm{eff},\odot})^{3.5} }{L/L_\odot} \nu_{\textrm{max}, \odot}
+     \nu_\textrm{max} \propto M R^{-2} T_{\rm eff}^{-1/2},
 
-and Equation 2
+and Equation 3
 
 .. math::
 
-    \Delta \nu_\textrm{max} \approx \frac{(M / M_\odot)^{0.5} (T_\textrm{eff}/
-    T_{\textrm{eff},\odot})^{3} }{(L/L_\odot)^{0.75}} \Delta \nu_{\odot}.
+    \Delta \nu_\textrm{max} \propto M^{1/2} R^{-3/2}.
 
 
-The amplitude scaling of the p-mode oscillations is given by Equation 9:
+The amplitude scaling of the p-mode oscillations is given by Equation 9 of
+`Huber et al. (2011) <http://adsabs.harvard.edu/abs/2011ApJ...743..143H>`_:
 
 .. math::
 
@@ -76,7 +79,8 @@ where :math:`r = 2`, :math:`s = 0.886`, :math:`t = 1.89` and
 
 .. math::
 
-    c(T_\textrm{eff}) = \left( \frac{T_\textrm{eff}}{5934 \textrm{K}} \right)^{0.8}.
+    c(T_\textrm{eff}) = \left( \frac{T_\textrm{eff}}{5934 \textrm{K}}
+    \right)^{0.8}.
 
 
 Scaling relations for granulation
@@ -95,4 +99,7 @@ amplitude of the granulation scales as
 
 .. math::
 
-    a \propto \nu^{-0.5}_\textrm{max}.
+    a \propto \nu^{-2}_\textrm{max}.
+
+(`Kjeldsen & Bedding, 2011
+<http://adsabs.harvard.edu/abs/2011A%26A...529L...8K>`_).

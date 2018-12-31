@@ -4,49 +4,12 @@ from celerite import terms
 import astropy.units as u
 from astropy.constants import L_sun, M_sun, R_sun
 import os
-from astropy.io import fits
 
-__all__ = ['generate_solar_fluxes', 'generate_stellar_fluxes']#, 'virgo_data']
+__all__ = ['generate_solar_fluxes', 'generate_stellar_fluxes']
 
 dirname = os.path.dirname(os.path.abspath(__file__))
 parameter_vector = np.loadtxt(os.path.join(dirname, 'data',
                                            'parameter_vector.txt'))
-
-# virgo_data_path = os.path.join(dirname, 'data', 'VIRGO_1min_0083-7404.fits.gz')
-#
-#
-# class VIRGOData(object):
-#     """
-#     Container for VIRGO observations, which are loaded lazily.
-#     """
-#     def __init__(self, path=virgo_data_path):
-#         self.path = path
-#         self._data = None
-#         self._times = None
-#
-#     @property
-#     def data(self):
-#         if self._data is None:
-#             self._data = fits.getdata(self.path, cache=False)
-#             self._times = np.arange(len(self._data)) * 60
-#         return self._times, self._data
-#
-# virgo_data = VIRGOData()
-
-
-def apply_freq_cutoffs(y_concatenated, cadence):
-    """
-    Detrend to remove correlations at shortest and highest frequencies
-    """
-    rfft = np.fft.rfft(y_concatenated)
-    freqs = np.fft.rfftfreq(len(y_concatenated), d=cadence.to(u.s).value)
-    low_cutoff_freq = np.max([np.argmin(np.abs(freqs - 0.5 * 1e-6)), 1])
-    high_cutoff_freq = np.argmin(np.abs(freqs - 8e3 * 1e-6))
-    rfft[:low_cutoff_freq] = 0
-    rfft[high_cutoff_freq:] = 0
-    detrended = np.fft.irfft(rfft)
-    print(rfft.shape, low_cutoff_freq, high_cutoff_freq)
-    return detrended
 
 
 @u.quantity_input(cadence=u.s, duration=u.s)
@@ -88,14 +51,6 @@ def generate_solar_fluxes(duration, cadence=60*u.s,
 
     gp = celerite.GP(kernel)
 
-    # # For more efficient computation for large datasets, split into chunks:
-    # if duration.to(u.s).value >= 1e6:
-    #     divisor = 10000
-    #     x = np.arange(0, duration.to(u.s).value//divisor, cadence.to(u.s).value)
-    #     times = np.arange(0, duration.to(u.s).value,
-    #                       cadence.to(u.s).value) * u.s
-    # else:
-    #     divisor = 1
     times = np.arange(0, duration.to(u.s).value, cadence.to(u.s).value) * u.s
     x = times.value
 
@@ -105,7 +60,7 @@ def generate_solar_fluxes(duration, cadence=60*u.s,
     # Get samples with the kernel's PSD
     ###################################
 
-    y = gp.sample() #size=divisor+1 if divisor != 1 else divisor)
+    y = gp.sample()
 
     # Reassemble the chunks
     y -= np.polyval(np.polyfit(x - x.mean(), y, 1), x - x.mean())
@@ -216,17 +171,8 @@ def generate_stellar_fluxes(duration, M, T_eff, R, L, cadence=60*u.s,
 
     gp = celerite.GP(kernel)
 
-    # For more efficient computation for large datasets, split into chunks:
-    if duration.to(u.s).value >= 1e5:
-        divisor = 500
-        x = np.arange(0, duration.to(u.s).value//divisor, cadence.to(u.s).value)
-        times = np.arange(0, duration.to(u.s).value,
-                          cadence.to(u.s).value) * u.s
-    else:
-        divisor = 1
-        times = np.arange(0, duration.to(u.s).value,
-                          cadence.to(u.s).value) * u.s
-        x = times.value
+    times = np.arange(0, duration.to(u.s).value, cadence.to(u.s).value) * u.s
+    x = times.value
 
     gp.compute(x, check_sorted=False)
 
@@ -234,26 +180,9 @@ def generate_stellar_fluxes(duration, M, T_eff, R, L, cadence=60*u.s,
     # Get samples with the kernel's PSD
     ###################################
 
-    y = gp.sample(size=divisor+1 if divisor != 1 else divisor)
+    y = gp.sample()
 
-    y_concatenated = []
+    # Reassemble the chunks
+    y -= np.polyval(np.polyfit(x - x.mean(), y, 1), x - x.mean())
 
-    for i, yi in enumerate(y):
-        xi = np.arange(len(yi))
-        fit = np.polyval(np.polyfit(xi - xi.mean(), yi, 1), xi-xi.mean())
-        yi -= fit
-
-        if i == 0:
-            y_concatenated.append(yi)
-        else:
-            offset = yi[0] - y_concatenated[i-1][-1]
-            y_concatenated.append(yi - offset)
-
-    y_concatenated = np.hstack(y_concatenated)[:len(times)]
-
-    # y_concatenated -= np.polyval(np.polyfit(x - x.mean(), y_concatenated, 1),
-    #                              x - x.mean())
-
-    return times, y_concatenated, kernel
-
-from scipy.signal import periodogram
+    return times, y, kernel
