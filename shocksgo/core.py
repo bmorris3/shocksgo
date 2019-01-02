@@ -21,8 +21,8 @@ def generate_solar_fluxes(duration, cadence=60*u.s,
     
     Parameters
     ----------
-    size : int
-        Number of fluxes to generate. Note: Assumes ``size``>>500.
+    duration : `~astropy.units.Quantity`
+        Duration of simulated observations to generate.
     cadence : `~astropy.units.Quantity`
         Length of time between fluxes
     
@@ -73,12 +73,12 @@ def generate_stellar_fluxes(duration, M, T_eff, R, L, cadence=60*u.s,
     """
     Generate an array of fluxes with zero mean which mimic the power spectrum of
     the SOHO/VIRGO SPM observations, scaled for a star with a given mass,
-    effective temperature and luminosity.
+    effective temperature, luminosity and radius.
     
     Parameters
     ----------
-    size : int
-        Number of fluxes to generate. Note: Assumes ``size``>>500.
+    duration : `~astropy.units.Quantity`
+        Duration of simulated observations to generate.
     M : `~astropy.units.Quantity`
         Stellar mass
     T_eff : `~astropy.units.Quantity`

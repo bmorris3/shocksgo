@@ -13,6 +13,7 @@ def power_spectrum(samples, d=60):
         Samples
     d : float
         Time between samples [s].
+
     Returns
     -------
     freq : `~numpy.ndarray`
