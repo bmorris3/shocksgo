@@ -8,13 +8,24 @@ import os
 __all__ = ['generate_solar_fluxes', 'generate_stellar_fluxes']
 
 dirname = os.path.dirname(os.path.abspath(__file__))
-parameter_vector = np.loadtxt(os.path.join(dirname, 'data',
-                                           'parameter_vector.txt'))
+PARAM_VECTOR = np.loadtxt(os.path.join(dirname, 'data', 'parameter_vector.txt'))
+
+
+def _process_inputs(duration, cadence):
+    """
+    Check for sensible inputs.
+
+    Raises
+    ------
+    ValueError
+        If duration is iess than or equal to the cadence.
+    """
+    if duration <= cadence:
+        raise ValueError("``duration`` must be longer than ``cadence``")
 
 
 @u.quantity_input(cadence=u.s, duration=u.s)
-def generate_solar_fluxes(duration, cadence=60*u.s,
-                          parameter_vector=parameter_vector):
+def generate_solar_fluxes(duration, cadence=60*u.s):
     """
     Generate an array of fluxes with zero mean which mimic the power spectrum of
     the SOHO/VIRGO SPM observations.
@@ -35,16 +46,19 @@ def generate_solar_fluxes(duration, cadence=60*u.s,
     kernel : `~celerite.terms.TermSum`
         Celerite kernel used to approximate the solar power spectrum.
     """
+
+    _process_inputs(duration, cadence)
+
     ##########################
     # Assemble celerite kernel
     ##########################
-    parameter_vector = np.copy(parameter_vector)
+    parameter_vector = np.copy(PARAM_VECTOR)
 
     nterms = len(parameter_vector)//3
 
-    kernel = terms.SHOTerm(log_S0=0, log_omega0=0, log_Q=0) 
+    kernel = terms.SHOTerm(log_S0=0, log_omega0=0, log_Q=0)
 
-    for term in range(nterms-1): 
+    for term in range(nterms-1):
         kernel += terms.SHOTerm(log_S0=0, log_omega0=0, log_Q=0)
 
     kernel.set_parameter_vector(parameter_vector)
@@ -68,8 +82,7 @@ def generate_solar_fluxes(duration, cadence=60*u.s,
 
 
 @u.quantity_input(duration=u.s, cadence=u.s, M=u.kg, T_eff=u.K, L=u.W, R=u.m)
-def generate_stellar_fluxes(duration, M, T_eff, R, L, cadence=60*u.s,
-                            parameter_vector=parameter_vector):
+def generate_stellar_fluxes(duration, M, T_eff, R, L, cadence=60*u.s):
     """
     Generate an array of fluxes with zero mean which mimic the power spectrum of
     the SOHO/VIRGO SPM observations, scaled for a star with a given mass,
@@ -99,10 +112,13 @@ def generate_stellar_fluxes(duration, M, T_eff, R, L, cadence=60*u.s,
     kernel : `~celerite.terms.TermSum`
         Celerite kernel used to approximate the stellar power spectrum.
     """
+
+    _process_inputs(duration, cadence)
+
     ##########################
     # Scale p-mode frequencies
     ##########################
-    parameter_vector = np.copy(parameter_vector)
+    parameter_vector = np.copy(PARAM_VECTOR)
 
     # Scale frequencies
     tunable_amps = np.exp(parameter_vector[::3][2:])
@@ -150,9 +166,9 @@ def generate_stellar_fluxes(duration, M, T_eff, R, L, cadence=60*u.s,
 
     # Kallinger 2014 pg 12:
     tau_eff_factor = (new_peak_freq/peak_freq)**-0.89
+    parameter_vector[5] = np.log(np.exp(parameter_vector[5]) / tau_eff_factor)
     # Kjeldsen & Bedding (2011):
     granulation_amplitude_factor = (new_peak_freq/peak_freq)**-2
-    parameter_vector[5] = np.log(np.exp(parameter_vector[5]) / tau_eff_factor)
     parameter_vector[3] = np.log(np.exp(parameter_vector[3]) *
                                  granulation_amplitude_factor)
 
