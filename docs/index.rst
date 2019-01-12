@@ -86,8 +86,8 @@ where :math:`r = 2`, :math:`s = 0.886`, :math:`t = 1.89` and
 Scaling relations for granulation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For computation of stellar granulation frequency, we use the scaling relation
-found in
+For computation of large and small scale stellar surface granulation frequencies,
+we use the scaling relation found in
 `Kallinger et al. (2014) <http://adsabs.harvard.edu/abs/2014A%26A...570A..41K>`_:
 
 .. math::
@@ -95,7 +95,7 @@ found in
     \tau_\textrm{eff} \propto \nu^{-0.89}_\textrm{max},
 
 where :math:`\tau_\textrm{eff}` is the characteristic granulation timescale. The
-amplitude of the granulation scales as
+amplitudes of granulation scale as
 
 .. math::
 

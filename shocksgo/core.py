@@ -75,9 +75,9 @@ def generate_solar_fluxes(duration, cadence=60*u.s):
     ###################################
 
     y = gp.sample()
-
-    # Reassemble the chunks
+    # Remove a linear trend:
     y -= np.polyval(np.polyfit(x - x.mean(), y, 1), x - x.mean())
+
     return times, y, kernel
 
 
@@ -121,6 +121,7 @@ def generate_stellar_fluxes(duration, M, T_eff, R, L, cadence=60*u.s):
     parameter_vector = np.copy(PARAM_VECTOR)
 
     # Scale frequencies
+
     tunable_amps = np.exp(parameter_vector[::3][2:])
     tunable_freqs = np.exp(parameter_vector[2::3][2:]) * 1e6/2/np.pi
     peak_ind = np.argmax(tunable_amps)
@@ -143,12 +144,33 @@ def generate_stellar_fluxes(duration, M, T_eff, R, L, cadence=60*u.s):
 
     parameter_vector[2::3][2:] = new_log_omegas
 
+
+    #############################################
+    # Scale mode lifetimes of p-mode oscillations
+    #############################################
+
+    q = np.exp(parameter_vector[1::3][2:])
+    fwhm = 1/(2*np.pi*q)
+
+    # From Enrico Corsaro (private communication), see Figure 7 of Corsaro 2015,
+    # where X is T_eff.
+    ln_FWHM = lambda X: (1463.49 - 1.03503*X + 0.000271565*X**2 -
+                         3.14139e-08*X**3 + 1.35524e-12*X**4)
+    fwhm_scale = np.exp(ln_FWHM(5777))/np.exp(ln_FWHM(np.max([T_eff.value, 4900])))
+
+    scaled_fwhm = fwhm * fwhm_scale
+    scaled_lnq = np.log(1/(2*np.pi*scaled_fwhm))
+    parameter_vector[1::3][2:] = scaled_lnq
+
+    ##############################################################
     # Scale amplitudes of p-mode oscillations following Huber 2011
+    ##############################################################
+
     # Huber 2011 Eqn 8:
     c = (T_eff/(5934 * u.K))**0.8
     c_sun = ((5777 * u.K)/(5934 * u.K))**0.8
-    s = 0.886
     r = 2
+    s = 0.886
     t = 1.89
 
     # Huber 2011 Eqn 9:
@@ -157,7 +179,7 @@ def generate_stellar_fluxes(duration, M, T_eff, R, L, cadence=60*u.s):
     pmode_amp_factor = pmode_amp_star / pmode_amp_sun
 
     new_pmode_amps = np.log(np.exp(parameter_vector[0::3][2:]) *
-                            pmode_amp_factor)
+                            pmode_amp_factor * fwhm_scale)
     parameter_vector[0::3][2:] = new_pmode_amps
 
     #############################
@@ -166,9 +188,12 @@ def generate_stellar_fluxes(duration, M, T_eff, R, L, cadence=60*u.s):
 
     # Kallinger 2014 pg 12:
     tau_eff_factor = (new_peak_freq/peak_freq)**-0.89
+    parameter_vector[2] = np.log(np.exp(parameter_vector[2]) / tau_eff_factor)
     parameter_vector[5] = np.log(np.exp(parameter_vector[5]) / tau_eff_factor)
     # Kjeldsen & Bedding (2011):
     granulation_amplitude_factor = (new_peak_freq/peak_freq)**-2
+    parameter_vector[0] = np.log(np.exp(parameter_vector[0]) *
+                                 granulation_amplitude_factor)
     parameter_vector[3] = np.log(np.exp(parameter_vector[3]) *
                                  granulation_amplitude_factor)
 
@@ -197,8 +222,7 @@ def generate_stellar_fluxes(duration, M, T_eff, R, L, cadence=60*u.s):
     ###################################
 
     y = gp.sample()
-
-    # Reassemble the chunks
+    # Remove a linear trend
     y -= np.polyval(np.polyfit(x - x.mean(), y, 1), x - x.mean())
 
     return times, y, kernel
