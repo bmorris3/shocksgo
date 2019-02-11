@@ -18,7 +18,7 @@ def _process_inputs(duration, cadence):
     Raises
     ------
     ValueError
-        If duration is iess than or equal to the cadence.
+        If duration is less than or equal to the cadence.
     """
     if duration <= cadence:
         raise ValueError("``duration`` must be longer than ``cadence``")

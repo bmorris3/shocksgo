@@ -7,7 +7,7 @@ curves using ``shocksgo``.
 Generating a Solar Light Curve
 ------------------------------
 
-To generate a sample of ten houros of solar fluxes at 60 second cadence, we can use
+To generate a sample of ten hours of solar fluxes at 60 second cadence, we can use
 `~shocksgo.generate_solar_fluxes`::
 
     import matplotlib.pyplot as plt
@@ -40,17 +40,16 @@ reproduce the solar power spectrum::
     import matplotlib.pyplot as plt
     import numpy as np
     import astropy.units as u
-    from shocksgo import power_spectrum
 
-    from shocksgo import generate_solar_fluxes
+    from shocksgo import generate_solar_fluxes, power_spectrum
 
     times, fluxes, kernel = generate_solar_fluxes(duration=100*u.day, cadence=60*u.s)
 
     freq, power = power_spectrum(fluxes, d=60)
 
     plt.loglog(freq * 1e6, power, ',', label='Samples')
-    plt.loglog(freq * 1e6, kernel.get_psd(2*np.pi*freq)/(2*np.pi), alpha=0.7, label='Kernel')
-    plt.ylim([1e-12, 1e-2])
+    plt.loglog(freq * 1e6, 1e6 * kernel.get_psd(2*np.pi*freq)/(2*np.pi), alpha=0.7, label='Kernel')
+    plt.ylim([1e-5, 1e3])
     plt.xlim([1e-2, 1e4])
     plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power')
     plt.show()
@@ -70,8 +69,8 @@ reproduce the solar power spectrum::
     freq, power = power_spectrum(fluxes, d=60)
 
     plt.loglog(freq * 1e6, power, ',', label='Samples')
-    plt.loglog(freq * 1e6, kernel.get_psd(2*np.pi*freq)/(2*np.pi), alpha=0.7, label='Kernel')
-    plt.ylim([1e-12, 1e-2])
+    plt.loglog(freq * 1e6, 1e6 * kernel.get_psd(2*np.pi*freq)/(2*np.pi), alpha=0.7, label='Kernel')
+    plt.ylim([1e-5, 1e3])
     plt.xlim([1e-2, 1e4])
     plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power')
     plt.show()
@@ -92,8 +91,8 @@ Zooming into the p-mode oscillations, we can see the peaks are reproduced:
     freq, power = power_spectrum(fluxes, d=60)
 
     plt.semilogy(freq * 1e6, power, ',', label='Samples')
-    plt.semilogy(freq * 1e6, kernel.get_psd(2*np.pi*freq)/(2*np.pi), alpha=0.7, label='Kernel')
-    plt.ylim([1e-11, 1e-7])
+    plt.semilogy(freq * 1e6, 1e6 * kernel.get_psd(2*np.pi*freq)/(2*np.pi), alpha=0.7, label='Kernel')
+    plt.ylim([1e-5, 1e-1])
     plt.xlim([2000, 4000])
     plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power')
     plt.show()
@@ -165,8 +164,8 @@ if we plot the power spectrum::
     freq, power = power_spectrum(fluxes, d=60)
 
     plt.semilogy(freq * 1e6, power, ',', label='Samples')
-    plt.semilogy(freq * 1e6, kernel.get_psd(2*np.pi*freq)/(2*np.pi), alpha=0.7, label='Kernel')
-    plt.ylim([1e-12, 1e-6])
+    plt.semilogy(freq * 1e6, 1e6 * kernel.get_psd(2*np.pi*freq)/(2*np.pi), alpha=0.7, label='Kernel')
+    plt.ylim([1e-5, 1e-1])
     plt.xlim([2500, 5000])
     plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power')
     plt.show()
@@ -192,8 +191,8 @@ if we plot the power spectrum::
     freq, power = power_spectrum(fluxes, d=60)
 
     plt.semilogy(freq * 1e6, power, ',', label='Samples')
-    plt.semilogy(freq * 1e6, kernel.get_psd(2*np.pi*freq)/(2*np.pi), alpha=0.7, label='Kernel')
-    plt.ylim([1e-12, 1e-6])
+    plt.semilogy(freq * 1e6, 1e6 * kernel.get_psd(2*np.pi*freq)/(2*np.pi), alpha=0.7, label='Kernel')
+    plt.ylim([1e-5, 1e-1])
     plt.xlim([2500, 5000])
     plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power')
     plt.show()
