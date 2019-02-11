@@ -40,9 +40,9 @@ def generate_solar_fluxes(duration, cadence=60*u.s):
     Returns
     -------
     times : `~astropy.units.Quantity`
-        Array of times at cadence ``cadence`` of length ``size``
+        Array of times at cadence ``cadence`` of length ``duration/cadence``
     fluxes : `~numpy.ndarray`
-        Array of fluxes at cadence ``cadence`` of length ``size``.
+        Array of fluxes at cadence ``cadence`` of length ``duration/cadence``
     kernel : `~celerite.terms.TermSum`
         Celerite kernel used to approximate the solar power spectrum.
     """
@@ -106,11 +106,11 @@ def generate_stellar_fluxes(duration, M, T_eff, R, L, cadence=60*u.s):
     Returns
     -------
     times : `~astropy.units.Quantity`
-        Array of times at cadence ``cadence`` of length ``size``
+        Array of times at cadence ``cadence`` of size ``duration/cadence``
     fluxes : `~numpy.ndarray`
-        Array of fluxes at cadence ``cadence`` of length ``size``.
+        Array of fluxes at cadence ``cadence`` of size ``duration/cadence``
     kernel : `~celerite.terms.TermSum`
-        Celerite kernel used to approximate the stellar power spectrum.
+        Celerite kernel used to approximate the stellar power spectrum
     """
 
     _process_inputs(duration, cadence)
