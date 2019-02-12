@@ -51,7 +51,7 @@ reproduce the solar power spectrum::
     plt.loglog(freq * 1e6, 1e6 * kernel.get_psd(2*np.pi*freq)/(2*np.pi), alpha=0.7, label='Kernel')
     plt.ylim([1e-5, 1e3])
     plt.xlim([1e-2, 1e4])
-    plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power')
+    plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power [ppm$^2$/$\mu$Hz]')
     plt.show()
 
 
@@ -72,7 +72,7 @@ reproduce the solar power spectrum::
     plt.loglog(freq * 1e6, 1e6 * kernel.get_psd(2*np.pi*freq)/(2*np.pi), alpha=0.7, label='Kernel')
     plt.ylim([1e-5, 1e3])
     plt.xlim([1e-2, 1e4])
-    plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power')
+    plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power [ppm$^2$/$\mu$Hz]')
     plt.show()
 
 Zooming into the p-mode oscillations, we can see the peaks are reproduced:
@@ -94,7 +94,7 @@ Zooming into the p-mode oscillations, we can see the peaks are reproduced:
     plt.semilogy(freq * 1e6, 1e6 * kernel.get_psd(2*np.pi*freq)/(2*np.pi), alpha=0.7, label='Kernel')
     plt.ylim([1e-5, 1e-1])
     plt.xlim([2000, 4000])
-    plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power')
+    plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power [ppm$^2$/$\mu$Hz]')
     plt.show()
 
 
@@ -167,7 +167,7 @@ if we plot the power spectrum::
     plt.semilogy(freq * 1e6, 1e6 * kernel.get_psd(2*np.pi*freq)/(2*np.pi), alpha=0.7, label='Kernel')
     plt.ylim([1e-5, 1e-1])
     plt.xlim([2500, 5000])
-    plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power')
+    plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power [ppm$^2$/$\mu$Hz]')
     plt.show()
 
 
@@ -194,5 +194,73 @@ if we plot the power spectrum::
     plt.semilogy(freq * 1e6, 1e6 * kernel.get_psd(2*np.pi*freq)/(2*np.pi), alpha=0.7, label='Kernel')
     plt.ylim([1e-5, 1e-1])
     plt.xlim([2500, 5000])
-    plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power')
+    plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power [ppm$^2$/$\mu$Hz]')
     plt.show()
+
+
+Custom Frequencies
+------------------
+
+Suppose you have a list of model p-mode frequencies, and you would like to
+generate a light curve from your custom list of frequencies (without scaling
+from the solar values). You can do so using a different set of keyword arguments
+in the `~shocksgo.generate_stellar_fluxes` function, like so::
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import astropy.units as u
+    from astropy.constants import R_sun, M_sun, L_sun
+
+    from shocksgo import generate_stellar_fluxes
+
+    M = 1*M_sun
+    L = 1*L_sun
+    T_eff = 5777 * u.K
+    R = 1*R_sun
+
+    freqs = np.linspace(2000, 4000, 10)  # in microHertz
+    log_amps = np.exp(-0.5 * (freqs - 3000)**2 / 1000**2) - 32
+    log_lifetimes = np.ones_like(freqs) * 7
+    duration = 2 * u.min
+
+    times, fluxes, kernel = generate_stellar_fluxes(duration, M, T_eff, R, L,
+                                                    frequencies=freqs,
+                                                    log_amplitudes=log_amps,
+                                                    log_mode_lifetimes=log_lifetimes)
+
+    test_freqs = np.logspace(-2, np.log10(freqs.max()), 1e6)
+    plt.loglog(test_freqs, 1e6/(2*np.pi) * kernel.get_psd(2*np.pi*test_freqs*1e-6))
+    plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power [ppm$^2$/$\mu$Hz]')
+    plt.show()
+
+
+.. plot::
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import astropy.units as u
+    from astropy.constants import R_sun, M_sun, L_sun
+
+    from shocksgo import generate_stellar_fluxes
+
+    M = 1*M_sun
+    L = 1*L_sun
+    T_eff = 5777 * u.K
+    R = 1*R_sun
+
+    freqs = np.linspace(2000, 4000, 10)
+    log_amps = np.exp(-0.5 * (freqs - 3000)**2 / 1000**2) - 32
+    log_lifetimes = np.ones_like(freqs) * 7
+    duration = 2 * u.min
+
+    times, fluxes, kernel = generate_stellar_fluxes(duration, M, T_eff, R, L,
+                                                    frequencies=freqs,
+                                                    log_amplitudes=log_amps,
+                                                    log_mode_lifetimes=log_lifetimes)
+
+    test_freqs = np.logspace(-2, np.log10(freqs.max()), 1e6)
+    plt.loglog(test_freqs, 1e6/(2*np.pi) * kernel.get_psd(2*np.pi*test_freqs*1e-6))
+    plt.gca().set(xlabel='Frequency [$\mu$Hz]', ylabel='Power [ppm$^2$/$\mu$Hz]')
+    plt.show()
+
+
