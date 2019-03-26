@@ -27,7 +27,7 @@ def _process_inputs(duration, cadence, T_eff):
 
 
 @u.quantity_input(cadence=u.s, duration=u.s)
-def generate_solar_fluxes(duration, cadence=60*u.s):
+def generate_solar_fluxes(duration, cadence=60*u.s, seed=None):
     """
     Generate an array of fluxes with zero mean which mimic the power spectrum of
     the SOHO/VIRGO SPM observations.
@@ -38,6 +38,8 @@ def generate_solar_fluxes(duration, cadence=60*u.s):
         Duration of simulated observations to generate.
     cadence : `~astropy.units.Quantity`
         Length of time between fluxes
+    seed : float, optional
+        Random seed.
     
     Returns
     -------
@@ -48,6 +50,8 @@ def generate_solar_fluxes(duration, cadence=60*u.s):
     kernel : `~celerite.terms.TermSum`
         Celerite kernel used to approximate the solar power spectrum.
     """
+    if seed is not None:
+        np.random.seed(seed)
 
     _process_inputs(duration, cadence, 5777 * u.K)
 
@@ -86,7 +90,7 @@ def generate_solar_fluxes(duration, cadence=60*u.s):
 @u.quantity_input(duration=u.s, cadence=u.s, M=u.kg, T_eff=u.K, L=u.W, R=u.m)
 def generate_stellar_fluxes(duration, M, T_eff, R, L, cadence=60*u.s,
                             frequencies=None, log_amplitudes=None,
-                            log_mode_lifetimes=None):
+                            log_mode_lifetimes=None, seed=None):
     """
     Generate an array of fluxes with zero mean which mimic the power spectrum of
     the SOHO/VIRGO SPM observations, scaled for a star with a given mass,
@@ -115,7 +119,9 @@ def generate_stellar_fluxes(duration, M, T_eff, R, L, cadence=60*u.s,
     log_mode_lifetimes : `~numpy.ndarray` or None
         p-mode lifetimes in the power spectrum. Defaults to scaled solar
         values.
-    
+    seed : float, optional
+        Random seed.
+
     Returns
     -------
     times : `~astropy.units.Quantity`
@@ -125,7 +131,9 @@ def generate_stellar_fluxes(duration, M, T_eff, R, L, cadence=60*u.s,
     kernel : `~celerite.terms.TermSum`
         Celerite kernel used to approximate the stellar power spectrum
     """
-
+    if seed is not None:
+        np.random.seed(seed)
+        
     _process_inputs(duration, cadence, T_eff)
 
     if frequencies is None:
